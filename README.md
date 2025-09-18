@@ -1,163 +1,186 @@
-# Exno.6-Prompt-Engg
-## Name : PREM KUMAR K  
-## Register no: 212223060209
-# Aim 
-Development of Python Code Compatible with Multiple AI Tools
+# Ex.No.6 Development of Python Code Compatible with Multiple AI Tools
 
-# Algorithm: Write and implement Python code that integrates with multiple AI tools to automate the task of interacting with APIs, comparing outputs, and generating actionable insights.
-a. Connects to multiple AI services via APIs.
+# Date: 17.09.2025
+# Register no. 212223060209
+# Aim: Write and implement Python code that integrates with multiple AI tools to automate the task of interacting with APIs, comparing outputs, and generating actionable insights with Multiple AI Tools
 
-b. Sends standardized prompts or inputs.
+#AI Tools Required:
 
-c. Collects and stores the outputs.
+# Explanation:
+Experiment the persona pattern as a programmer for any specific applications related with your interesting area. 
+Generate the outoput using more than one AI tool and based on the code generation analyse and discussing that. 
 
-d. Compares the outputs for quality, tone, performance, or accuracy.
+# Conclusion:
 
-e. Generates reports or logs for further analysis.
+Integrating multiple AI tools for a task requires a programmatic approach that can manage API interactions, handle different data formats, and process outputs for a unified analysis. Python is an excellent choice for this due to its extensive ecosystem of libraries for both AI/ML and API communication.
 
-## Aim
-To help in benchmarking AI tools and determining the best tool for a particular task or use case.
+# Python Code Implementation
 
-## Procedure / Algorithm:
-### Step 1: Define the Use Case
-Choose a specific AI task where multiple tools can be compared, such as:
+The following is a conceptual Python code structure for a programmer persona focused on a specific application, such as generating and analyzing content. This example will use a hypothetical scenario of comparing two different large language models (LLMs) to generate content based on a user prompt, and then use a third AI-powered tool (like a sentiment analysis API) to analyze the generated outputs.
 
-a. Text summarization
 
-b. Image generation
+# Code:
 
-c. Audio synthesis
-
-d. Sentiment analysis
-
-e. Translation
-
-Example Use Case: Compare summarization capabilities of ChatGPT (OpenAI) and Cohere.
-
-### Step 2: Set Up API Access
-Register or subscribe to APIs of the tools you want to use.
-
-Store API keys securely (e.g., using environment variables or secrets module).
-
-python
 import os
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-COHERE_API_KEY = os.getenv("COHERE_API_KEY")
-
-
-### Step 3: Write API Interaction Functions
-Create reusable functions to interact with each AI service.
-
-python
-
-import openai
-import cohere
-
-def get_openai_summary(text):
-    openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": f"Summarize this: {text}"}]
-    )
-    return response['choices'][0]['message']['content']
-
-def get_cohere_summary(text):
-    co = cohere.Client(COHERE_API_KEY)
-    response = co.summarize(text=text)
-    return response.summary
-
-
-### Step 4: Prepare a Prompt Dataset
-Store a list of test inputs (e.g., articles or paragraphs) to run through both tools.
-
-python
-
-test_inputs = [
-    "Artificial intelligence (AI) is rapidly evolving and...",
-    "Climate change is one of the most pressing issues..."
-]
-
-
-### Step 5: Compare Outputs Programmatically
-Loop through inputs, collect summaries, and store them for analysis.
-
-python
-
-results = []
-
-for text in test_inputs:
-    openai_output = get_openai_summary(text)
-    cohere_output = get_cohere_summary(text)
-    
-    comparison = {
-        "input": text,
-        "openai_summary": openai_output,
-        "cohere_summary": cohere_output
-    }
-    results.append(comparison)
-
-
-### Step 6: Generate Actionable Insights
-Apply analysis, such as:
-
-a. Word count comparison
-
-b. Sentiment scoring
-
-c. Keyword extraction
-
-d. Readability score
-
-python
-
-from textblob import TextBlob
-
-def analyze_summary(summary):
-    blob = TextBlob(summary)
-    return {
-        "word_count": len(summary.split()),
-        "sentiment": blob.sentiment.polarity,
-        "readability": blob.sentiment.subjectivity
-    }
-
-for result in results:
-    result["openai_analysis"] = analyze_summary(result["openai_summary"])
-    result["cohere_analysis"] = analyze_summary(result["cohere_summary"])
-
-
-### Step 7: Output a Summary Report
-Export findings to JSON or CSV.
-
-python
-
+import requests
 import json
+from abc import ABC, abstractmethod
 
-with open("summary_comparison.json", "w") as f:
-    json.dump(results, f, indent=4)
+# Abstract Base Class for AI Tool
+class AITool(ABC):
+    def __init__(self, api_key, api_url):
+        self.api_key = api_key
+        self.api_url = api_url
 
-Result:
-The Python code successfully:
+    @abstractmethod
+    def interact(self, prompt):
+        pass
 
-1. Connected with multiple AI tools using APIs.
+# Concrete class for LLM A (e.g., GPT-4)
+class LLM_A(AITool):
+    def interact(self, prompt):
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "gpt-4-turbo",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        try:
+            response = requests.post(self.api_url, headers=headers, json=data)
+            response.raise_for_status()
+            return response.json()['choices'][0]['message']['content']
+        except requests.exceptions.RequestException as e:
+            print(f"Error interacting with LLM A: {e}")
+            return None
 
-2. Sent uniform prompts for consistent evaluation.
+# Concrete class for LLM B (e.g., Claude 3)
+class LLM_B(AITool):
+    def interact(self, prompt):
+        headers = {
+            "x-api-key": self.api_key,
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "claude-3-opus-20240229",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        try:
+            response = requests.post(self.api_url, headers=headers, json=data)
+            response.raise_for_status()
+            return response.json()['content'][0]['text']
+        except requests.exceptions.RequestException as e:
+            print(f"Error interacting with LLM B: {e}")
+            return None
 
-3. Collected and compared results using natural language metrics.
+# Concrete class for Sentiment Analysis Tool
+class SentimentAnalyzer(AITool):
+    def interact(self, text):
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "text": text
+        }
+        try:
+            response = requests.post(self.api_url, headers=headers, json=data)
+            response.raise_for_status()
+            return response.json()['sentiment']
+        except requests.exceptions.RequestException as e:
+            print(f"Error interacting with Sentiment Analyzer: {e}")
+            return None
 
-4. Generated structured, actionable insights that can be used to evaluate tool performance.
+# Main function to run the process
+def main():
+    # --- Persona: Content Strategist for a Tech Blog ---
+    # Aim: Compare content from different AI models to find the most engaging and positive tone.
+    # We will use two LLMs to generate blog post intros and a sentiment analyzer to score them.
 
-## Conclusion:
-This experiment demonstrates how Python can serve as a powerful bridge between multiple AI tools, enabling developers to create multi-model pipelines that evaluate, compare, or combine the strengths of various services. This integration supports:
+    # 1. Initialize AI tools with API keys and URLs
+    llm_a = LLM_A(api_key=os.getenv("LLM_A_API_KEY"), api_url="https://api.openai.com/v1/chat/completions")
+    llm_b = LLM_B(api_key=os.getenv("LLM_B_API_KEY"), api_url="https://api.anthropic.com/v1/messages")
+    sentiment_tool = SentimentAnalyzer(api_key=os.getenv("SENTIMENT_API_KEY"), api_url="https://api.sentiment-analyzer.com/v1/analyze")
 
-1. Better decision-making on tool selection
+    # 2. Define the user prompt
+    user_prompt = "Write a compelling and positive blog post introduction about the future of renewable energy."
 
-2. Automation of evaluation and benchmarking
+    # 3. Get outputs from multiple AI tools
+    print("Generating content with LLM A...")
+    output_a = llm_a.interact(user_prompt)
+    
+    print("\nGenerating content with LLM B...")
+    output_b = llm_b.interact(user_prompt)
 
-3. Enhanced productivity by combining outputs
+    # 4. Compare outputs and generate insights
+    if output_a and output_b:
+        print("\n--- Comparing Outputs ---")
+        print("LLM A's Output:\n", output_a)
+        print("\nLLM B's Output:\n", output_b)
 
-Such a system is scalable and can be adapted for broader use cases including multi-tool chatbots, creative content workflows, or research benchmarking.
+        print("\n--- Generating Actionable Insights ---")
+        
+        # Analyze sentiment of each output
+        print("Analyzing sentiment of LLM A's output...")
+        sentiment_a = sentiment_tool.interact(output_a)
+        
+        print("Analyzing sentiment of LLM B's output...")
+        sentiment_b = sentiment_tool.interact(output_b)
+
+        print("\nSentiment Analysis Results:")
+        print(f"LLM A Sentiment: {sentiment_a}")
+        print(f"LLM B Sentiment: {sentiment_b}")
+        
+        # Actionable Insight
+        if sentiment_a == 'positive' and sentiment_b == 'positive':
+            if sentiment_a > sentiment_b: # Assuming a numerical score can be returned by the tool
+                print("\nActionable Insight: LLM A produced a slightly more positive output. We should use its content or fine-tune LLM B to match its tone.")
+            elif sentiment_b > sentiment_a:
+                print("\nActionable Insight: LLM B's content is more positive. We should prioritize it for our blog post and a/b test it against LLM A's output.")
+            else:
+                print("\nActionable Insight: Both models are performing well. We can A/B test their content to see which one performs better with our audience.")
+        else:
+            print("\nActionable Insight: One or both models failed to produce a positive output. We need to refine our prompt engineering to achieve the desired tone.")
+
+if __name__ == "__main__":
+    main()
+
+# Analysis and Discussion
+The code demonstrates a practical application of prompt engineering and multi-AI tool integration.
+
+# Code Generation Analysis
+Modularity and Abstraction: The use of an AITool abstract base class and concrete classes (LLM_A, LLM_B, SentimentAnalyzer) promotes code reusability and maintainability. This design pattern, often called the Strategy pattern, allows us to easily swap out or add new AI models without changing the core logic of the main function. For a prompt engineering course, this highlights the importance of creating a scalable and organized codebase.
+
+API Interaction: The requests library is a standard and robust way to interact with web APIs in Python. The code correctly handles headers and JSON payloads, which are common for RESTful API communication. It also includes basic error handling with try...except blocks and response.raise_for_status(), which is crucial for building reliable applications.
+
+Persona-Driven Design: The "Content Strategist" persona gives a specific, real-world context to the generic task of comparing AI outputs. This makes the experiment more tangible and goal-oriented. The goal of finding a "compelling and positive tone" directly informs the selection of a sentiment analysis tool for comparison.
+
+Discussion for a Prompt Engineering Course
+This experiment illustrates several key concepts for prompt engineering:
+
+Prompting is more than just text: The user_prompt is the core input, and its wording—"compelling and positive"—is a specific instruction that the AI models are expected to follow. The effectiveness of this prompt can be judged by the output of the sentiment analyzer.
+
+The need for a "golden standard": The sentiment analysis tool acts as a form of automated evaluation or a "golden standard." Manually reading and comparing the outputs is subjective. An automated tool provides an objective metric (in this case, "positive," "negative," or "neutral") that can be used to compare models efficiently and at scale.
+
+Actionable Insights: Simply getting two different outputs isn't enough. The final part of the code, which uses if/elif statements, translates the raw data (the sentiment scores) into actionable business insights. It tells the user not just what happened, but what to do next. This is the ultimate goal of AI integration: to drive decisions and actions.
+
+The power of a pipeline: The entire script forms an automated pipeline:
+
+# Input: User prompt.
+
+Processing (Parallel): Generate content from multiple LLMs.
+
+Processing (Sequential): Analyze each output with a separate tool.
+
+# Output: 
+Comparative analysis and an actionable recommendation.
+This demonstrates how different AI tools can be chained together to perform a complex task that a single tool could not accomplish alone.
+
+Building AI agents in Pure Python, without complex frameworks, is an excellent way to understand the core principles of AI integration.
 
 
-## Result: 
-The corresponding Prompt is executed successfully
+
+
+
+# Result: The corresponding Prompt is executed successfully.
