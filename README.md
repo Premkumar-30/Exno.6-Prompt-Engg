@@ -10,9 +10,6 @@
 Experiment the persona pattern as a programmer for any specific applications related with your interesting area. 
 Generate the outoput using more than one AI tool and based on the code generation analyse and discussing that. 
 
-# Conclusion:
-
-Integrating multiple AI tools for a task requires a programmatic approach that can manage API interactions, handle different data formats, and process outputs for a unified analysis. Python is an excellent choice for this due to its extensive ecosystem of libraries for both AI/ML and API communication.
 
 # Python Code Implementation
 
@@ -179,6 +176,10 @@ This demonstrates how different AI tools can be chained together to perform a co
 
 Building AI agents in Pure Python, without complex frameworks, is an excellent way to understand the core principles of AI integration.
 
+
+# Conclusion:
+
+Integrating multiple AI tools for a task requires a programmatic approach that can manage API interactions, handle different data formats, and process outputs for a unified analysis. Python is an excellent choice for this due to its extensive ecosystem of libraries for both AI/ML and API communication.
 
 
 
